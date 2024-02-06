@@ -23,11 +23,9 @@ public class Command {
     public static void tryMove(int direction) {
         int[] ratIndex = findRatIndex();
         int[] nextCellIndex = calculateNextCellIndex(ratIndex, direction);
-        System.out.printf("Rat found at %d %d\n", ratIndex[0], ratIndex[1]);
-        System.out.printf("move to cell %d %d\n", nextCellIndex[0], nextCellIndex[1]);
         boolean movable = checkMovable(ratIndex, nextCellIndex, direction);
         if(movable){
-            move(ratIndex, nextCellIndex);
+            moveAndCheckFood(ratIndex, nextCellIndex);
         }
     }
 
@@ -53,8 +51,14 @@ public class Command {
         }
         return nextCellIndex;
     }
-    private static void move(int[] ratIndex, int[] nextCellIndex){
+    private static void moveAndCheckFood(int[] ratIndex, int[] nextCellIndex){
         // status: 0 = wall, 1 = ground,  2 = ground with rat, 3 = ground with Food
+
+        // Check if the rat found food
+        if(maze.get(nextCellIndex[0]).get(nextCellIndex[1]).getStatus() == 3){
+            System.out.println("+++++ Found food +++++");
+        }
+        // Move
         maze.get(ratIndex[0]).get(ratIndex[1]).setStatus(1);
         maze.get(nextCellIndex[0]).get(nextCellIndex[1]).setStatus(2);
     }
@@ -64,9 +68,8 @@ public class Command {
 
         // Check if the rat can move to the direction (In current cell)
         List<Integer> ratCellEdges = maze.get(ratIndex[0]).get(ratIndex[1]).getEdges();
-        System.out.println(ratCellEdges);
         if(ratCellEdges.contains(direction)){
-            System.out.println("Can't Move (edge)");
+            System.out.println("Cannot Move (edge)");
             return false;
         }
 
@@ -74,10 +77,9 @@ public class Command {
         int nextCellStatus = maze.get(nextCellIndex[0]).get(nextCellIndex[1]).getStatus();
 
         if(nextCellStatus == 0){
-            System.out.println("Can't Move (wall)");
+            System.out.println("Cannot Move (wall)");
             return false;
         }
-        System.out.println("Can Move");
         return true;
     }
 
