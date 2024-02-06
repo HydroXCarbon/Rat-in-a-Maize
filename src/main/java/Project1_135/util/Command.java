@@ -67,9 +67,8 @@ public class Command {
     private static boolean checkMovable(int[] ratIndex, int[] nextCellIndex, int direction){
 
         // Check if the rat can move to the direction (In current cell)
-        List<Integer> ratCellEdges = maze.get(ratIndex[0]).get(ratIndex[1]).getEdges();
-        if(ratCellEdges.contains(direction)){
-            System.out.println("Cannot Move (edge)");
+        if(nextCellIndex[0] < 0 || nextCellIndex[0] >= mazeSize[0] || nextCellIndex[1] < 0 || nextCellIndex[1] >= mazeSize[1]){
+            System.out.println("Cannot Move (out of maze)");
             return false;
         }
 

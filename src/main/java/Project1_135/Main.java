@@ -89,38 +89,11 @@ public class Main {
             String line = fileScanner.nextLine();
             String[] col = line.split(",");
             mazeCol = col.length;
-            int hEdge;
-
-            // Check row edge
-            // edges 0 = top, 1 = right, 2 = bottom, 3 = left
-            if (mazeRow == 0) {
-                hEdge = 0;
-            } else if (!fileScanner.hasNextLine()) {
-                hEdge = 2;
-            } else {
-                hEdge = 3;
-            }
-
             ArrayList<Cell> row = new ArrayList<>();
 
             // Loop through each data
             for (int i = 0; i < mazeCol; i++) {
                 int status;
-                List<Integer> edges = new ArrayList<Integer>();
-
-                // Check row edge and add to the list
-                // edges: 0 = top, 1 = right, 2 = bottom, 3 = left
-                // edge == 3 means it's in middle of the maze (no horizontal edge)
-                if (!(hEdge == 3)) {
-                    edges.add(hEdge);
-                }
-
-                // Check col edge and add vertical edge to the list
-                if (i == 0) {
-                    edges.add(3);
-                } else if (i == mazeCol - 1) {
-                    edges.add(1);
-                }
 
                 // Check status
                 // status: 0 = wall, 1 = ground,  2 = ground with rat, 3 = ground with Food
@@ -142,7 +115,7 @@ public class Main {
                 }
 
                 // Store data
-                row.add(new Cell(status, edges));
+                row.add(new Cell(status));
             }
             maze.add(row);
             mazeRow++;
@@ -177,13 +150,15 @@ public class Main {
                 }
                 String status;
                 if (maze.get(i).get(j).getStatus() == 2) {
-                    status = "R";
+                    status = "\033[0;31m" + "R" + "\033[0m";
+                    System.out.printf("%-23s ", status);
                 } else if (maze.get(i).get(j).getStatus() == 3) {
-                    status = "F";
+                    status = "\033[0;32m" + "F" + "\033[0m";
+                    System.out.printf("%-23s ", status);
                 } else {
                     status = String.valueOf(maze.get(i).get(j).getStatus());
+                    System.out.printf("%-12s ", status);
                 }
-                System.out.printf("%-12s ", status);
                 if (j  == col - 1) {
                     System.out.println();
                 }
