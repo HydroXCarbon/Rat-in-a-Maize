@@ -19,6 +19,10 @@ public class Cell {
         return status;
     }
 
+    public void setStatus(int status){
+        this.status = status;
+    }
+
     public List<Integer> getEdges(){
         return edges;
     }
