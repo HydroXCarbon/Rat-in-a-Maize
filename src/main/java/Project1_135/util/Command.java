@@ -46,7 +46,7 @@ public class Command {
         System.out.printf("\n===== Finding Food %d =====\n",count);
         int[] ratIndex = findRatIndex();
         showData();
-        dfs(ratIndex);
+        bfs(ratIndex);
         if(foundFood){
             // Show path
             System.out.println("Rat path");
@@ -94,6 +94,45 @@ public class Command {
 
         // Clear path
         path.clear();
+    }
+
+    public static boolean bfs(int[] currentIndex){
+        ArrayDeque<int[]> queue = new ArrayDeque<>();
+
+        // If rat found food return
+        path.add(currentIndex);
+        if(foundFood || checkFood(currentIndex)){
+            foundFood = true;
+            return true;
+        }
+
+        // direction: 0 = top, 1 = right, 2 = bottom, 3 = left
+        // Start searching each direction
+        maze.get(currentIndex[0]).get(currentIndex[1]).setVisited(true);
+        for (int i = 0; i < 4; i++) {
+            int[] nextCellIndex = calculateNextCellIndex(currentIndex, i);
+            boolean movable = checkMovable(currentIndex, nextCellIndex, i);
+            if (movable) {
+                if(!maze.get(nextCellIndex[0]).get(nextCellIndex[1]).getVisited()){
+                    queue.add(nextCellIndex);
+                }
+            }
+        }
+
+        // If rat can't move return (backtracking)
+        if(queue.isEmpty()){
+            path.removeLast();
+            return false;
+        }
+
+        // Move to next cell
+        while(!queue.isEmpty()){
+            int[] next = queue.remove();
+            if(bfs(next)){
+                return true;
+            };
+        }
+        return false;
     }
 
     public static boolean dfs(int[] currentIndex){
