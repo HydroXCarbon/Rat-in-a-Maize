@@ -46,15 +46,17 @@ public class Command {
         System.out.printf("\n===== Finding Food %d =====\n",count);
         int[] ratIndex = findRatIndex();
         showData();
-        bfs(ratIndex);
+        dfs(ratIndex);
         if(foundFood){
             // Show path
             System.out.println("Rat path");
             for(int[] i : path){
                 int row = i[0];
-                int col = i[1];;
+                int col = i[1];
+                int direction = i[2];
                 int intStatus = maze.get(row).get(col).getStatus();
                 String strStatus = "";
+                String strDirection = "";
                 switch(intStatus){
                     case 0:
                         strStatus = "0";
@@ -69,7 +71,24 @@ public class Command {
                         strStatus = "F";
                         break;
                 }
-                System.out.printf("Path: -> (row %d, col %d, %s)\n",row ,col ,strStatus);
+                switch(direction){
+                    case -1:
+                        strDirection = "Start";
+                        break;
+                    case 0:
+                        strDirection = "Up";
+                        break;
+                    case 1:
+                        strDirection = "Right";
+                        break;
+                    case 2:
+                        strDirection = "Down";
+                        break;
+                    case 3:
+                        strDirection = "Left";
+                        break;
+                }
+                System.out.printf("%-7s %s: -> (row %d, col %d, %s)\n",strDirection,direction,row ,col ,strStatus);
                 move(ratIndex, path.getLast());
             }
             resetData();
@@ -96,51 +115,17 @@ public class Command {
         path.clear();
     }
 
-    public static boolean bfs(int[] currentIndex){
-        ArrayDeque<int[]> queue = new ArrayDeque<>();
-
-        // If rat found food return
-        path.add(currentIndex);
-        if(foundFood || checkFood(currentIndex)){
-            foundFood = true;
+    public static boolean dfs(int[] currentIndex){
+        // If food has already been found, stop the recursion
+        if (foundFood) {
             return true;
         }
 
-        // direction: 0 = top, 1 = right, 2 = bottom, 3 = left
-        // Start searching each direction
-        maze.get(currentIndex[0]).get(currentIndex[1]).setVisited(true);
-        for (int i = 0; i < 4; i++) {
-            int[] nextCellIndex = calculateNextCellIndex(currentIndex, i);
-            boolean movable = checkMovable(currentIndex, nextCellIndex, i);
-            if (movable) {
-                if(!maze.get(nextCellIndex[0]).get(nextCellIndex[1]).getVisited()){
-                    queue.add(nextCellIndex);
-                }
-            }
-        }
-
-        // If rat can't move return (backtracking)
-        if(queue.isEmpty()){
-            path.removeLast();
-            return false;
-        }
-
-        // Move to next cell
-        while(!queue.isEmpty()){
-            int[] next = queue.remove();
-            if(bfs(next)){
-                return true;
-            };
-        }
-        return false;
-    }
-
-    public static boolean dfs(int[] currentIndex){
         ArrayDeque<int[]> stack = new ArrayDeque<>();
+        path.add(currentIndex);
 
         // If rat found food return
-        path.add(currentIndex);
-        if(foundFood || checkFood(currentIndex)){
+        if(checkFood(currentIndex)){
             foundFood = true;
             return true;
         }
@@ -154,6 +139,7 @@ public class Command {
             boolean movable = checkMovable(currentIndex, nextCellIndex, i);
             if (movable) {
                 if(!maze.get(nextCellIndex[0]).get(nextCellIndex[1]).getVisited()){
+                    nextCellIndex[2] = i;
                     tempStack.add(nextCellIndex);
                 }
             }
@@ -235,7 +221,7 @@ public class Command {
         for (int i = 0; i < mazeSize[0]; i++) {
             for (int j = 0; j < mazeSize[1]; j++) {
                 if (maze.get(i).get(j).getStatus() == 2) {
-                    return new int[]{i, j};
+                    return new int[]{i, j, -1};
                 }
             }
         }
