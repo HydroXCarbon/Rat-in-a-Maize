@@ -88,7 +88,7 @@ public class Command {
                         strDirection = "Left";
                         break;
                 }
-                System.out.printf("%-7s %s: -> (row %d, col %d, %s)\n",strDirection,direction,row ,col ,strStatus);
+                System.out.printf("%-7s : -> (row %d, col %d, %s)\n",strDirection,row ,col ,strStatus);
                 move(ratIndex, path.getLast());
             }
             resetData();
@@ -121,8 +121,8 @@ public class Command {
             return true;
         }
 
-        ArrayDeque<int[]> stack = new ArrayDeque<>();
         path.add(currentIndex);
+        ArrayDeque<int[]> stack = new ArrayDeque<>();
 
         // If rat found food return
         if(checkFood(currentIndex)){
@@ -147,7 +147,9 @@ public class Command {
 
         // If rat can't move return (backtracking)
         if(tempStack.isEmpty()){
-            path.removeLast();
+            if (!path.isEmpty()) {
+                path.removeLast();
+            }
             return false;
         }
 
@@ -159,10 +161,11 @@ public class Command {
         }
 
         // Move to next cell
-        for(int[] i : stack){
-            if(dfs(i)){
+        while(!stack.isEmpty()){
+            int[] next = stack.remove();
+            if(dfs(next)){
                 return true;
-            };
+            }
         }
         return false;
     }
