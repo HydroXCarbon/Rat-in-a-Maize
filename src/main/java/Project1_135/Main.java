@@ -5,7 +5,6 @@ import Project1_135.util.Command;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Scanner;
 
 public class Main {
@@ -23,7 +22,7 @@ public class Main {
             try {
                 // Receive file name from user
                 String filename = receiveInput("New file name = ");
-
+                //String filename = "maize_1.txt";
                 // Read file and store data
                 Scanner fileScanner = new Scanner(new File(path + filename));
                 mazeSize = storeData(fileScanner, maze);
@@ -36,7 +35,7 @@ public class Main {
             } catch (Exception e) {
             }
         } while (!fileFound);
-        showData();
+        command.showData();
 
         // Wait for user input
         while (true) {
@@ -62,10 +61,9 @@ public class Main {
                     Command.tryMove(1);
                     break;
                 case "a":
-                    Command.autoMode();
+                    Command.autoMode(1);
                     break;
             }
-            showData();
         }
         //inputScanner.close();
     }
@@ -122,47 +120,10 @@ public class Main {
         }
 
         // Check maze size
-        if(mazeRow < 3 || mazeCol < 3){
+        if (mazeRow < 3 || mazeCol < 3) {
             throw new Exception("Invalid maze size");
         }
 
         return new int[]{mazeRow, mazeCol};
-    }
-
-    public static void showData() {
-        int row = mazeSize[0];
-        int col = mazeSize[1];
-
-        // Print column head
-        System.out.printf("%12s", " ");
-        for (int i = 0; i < col; i++) {
-            String colHead = "col_" + (i + 1);
-            System.out.printf("%-12s", colHead);
-        }
-        System.out.println();
-
-        // Print row head and maze data
-        for (int i = 0; i < row; i++) {
-            for( int j = 0; j < col; j++) {
-                if (j == 0) {
-                    String rowHead = "row_" + (i + 1);
-                    System.out.printf("%-14s", rowHead);
-                }
-                String status;
-                if (maze.get(i).get(j).getStatus() == 2) {
-                    status = "\033[0;31m" + "R" + "\033[0m";
-                    System.out.printf("%-23s ", status);
-                } else if (maze.get(i).get(j).getStatus() == 3) {
-                    status = "\033[0;32m" + "F" + "\033[0m";
-                    System.out.printf("%-23s ", status);
-                } else {
-                    status = String.valueOf(maze.get(i).get(j).getStatus());
-                    System.out.printf("%-12s ", status);
-                }
-                if (j  == col - 1) {
-                    System.out.println();
-                }
-            }
-        }
     }
 }
