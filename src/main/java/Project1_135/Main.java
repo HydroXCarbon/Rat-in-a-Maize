@@ -81,6 +81,7 @@ public class Main {
     }
 
     public static int[] storeData(Scanner fileScanner, ArrayList<ArrayList<Cell>> maze) throws Exception {
+        int amountFood = 0;
         int mazeRow = 0;
         int mazeCol = 0;
         while (fileScanner.hasNextLine()) {
@@ -106,6 +107,7 @@ public class Main {
                         status = 2;
                         break;
                     case "F":
+                        amountFood++;
                         status = 3;
                         break;
                     default:
@@ -123,6 +125,9 @@ public class Main {
         if (mazeRow < 3 || mazeCol < 3) {
             throw new Exception("Invalid maze size");
         }
+
+        // Set amount of food
+        command.setsFood(amountFood);
 
         return new int[]{mazeRow, mazeCol};
     }
