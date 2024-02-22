@@ -5,13 +5,10 @@ import Project1_135.model.Cell;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Random;
 
 import static java.lang.System.exit;
 
 public class Command {
-
-    private final static Random rand = new Random();
 
     private final static ArrayDeque<int[]> path = new ArrayDeque<>();
 
@@ -36,15 +33,15 @@ public class Command {
         int[] nextCellIndex = calculateNextCellIndex(ratIndex, direction);
         boolean movable = checkMovable(nextCellIndex);
         if (movable) {
-            move(ratIndex, nextCellIndex);
             if(checkFood(nextCellIndex)) {
                 System.out.println("+++++ Found food +++++");
                 foodLeft--;
             };
+            move(ratIndex, nextCellIndex);
         }else{
             System.out.println("Cannot Move");
         }
-        showData();
+        showTable();
         return foodLeft == 0;
     }
 
@@ -52,7 +49,7 @@ public class Command {
         // Using DFS to find the route
         System.out.printf("\n===== Finding Food %d =====\n",count);
         int[] ratIndex = findRatIndex();
-        showData();
+        showTable();
         DFS(ratIndex);
         if(foundFood){
             // Show path
@@ -95,6 +92,9 @@ public class Command {
                     case 3:
                         strDirection = "Left";
                         break;
+                }
+                if(i == path.getLast()){
+                    strStatus = "F";
                 }
                 System.out.printf("%-7s : -> (row %d, col %d, %s)\n",strDirection,row ,col ,strStatus);
                 move(ratIndex, path.getLast());
@@ -166,60 +166,6 @@ public class Command {
         return false;
     }
 
-//    public static boolean dfs(int[] currentIndex){
-//        // If food has already been found, stop the recursion
-//        if (foundFood) {
-//            return true;
-//        }
-//
-//        ArrayDeque<int[]> stack = new ArrayDeque<>();
-//        path.add(currentIndex);
-//
-//        // If rat found food return
-//        if(checkFood(currentIndex)){
-//            foundFood = true;
-//            return true;
-//        }
-//
-//        // direction: 0 = top, 1 = right, 2 = bottom, 3 = left
-//        // Start searching each direction
-//        ArrayList<int[]> tempStack = new ArrayList<>();
-//        maze.get(currentIndex[0]).get(currentIndex[1]).setVisited(true);
-//        for (int i = 0; i < 4; i++) {
-//            int[] nextCellIndex = calculateNextCellIndex(currentIndex, i);
-//            boolean movable = checkMovable(nextCellIndex);
-//            if (movable) {
-//                if(!maze.get(nextCellIndex[0]).get(nextCellIndex[1]).getVisited()){
-//                    nextCellIndex[2] = i;
-//                    tempStack.add(nextCellIndex);
-//                }
-//            }
-//        }
-//
-//        // If rat can't move return (backtracking)
-//        if(tempStack.isEmpty()){
-//            if (!path.isEmpty()) {
-//                path.removeLast();
-//            }
-//            return false;
-//        }
-//
-//        // Random add direction to stack
-//        while(!tempStack.isEmpty()){
-//            int randomIndex = rand.nextInt(tempStack.size());
-//            int[] removedElement = tempStack.remove(randomIndex);
-//            stack.add(removedElement);
-//        }
-//
-//        // Move to next cell
-//        while(!stack.isEmpty()){
-//            if(DFS(stack.remove())){
-//                return true;
-//            }
-//        }
-//        return false;
-//    }
-
     public static int[] calculateNextCellIndex(int[] currentIndex, int direction) {
         int[] nextCellIndex = currentIndex.clone();
         switch (direction) {
@@ -288,7 +234,7 @@ public class Command {
         foodLeft = amount;
     }
 
-    public static void showData() {
+    public static void showTable() {
         int row = mazeSize[0];
         int col = mazeSize[1];
 

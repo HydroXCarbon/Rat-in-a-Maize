@@ -23,6 +23,9 @@ public class Main {
                 try {
                     // Receive file name from user
                     String filename = receiveInput("New file name = ");
+                    if(filename.equalsIgnoreCase("exit")) {
+                        System.exit(0);
+                    }
 
                     // Read file and store data
                     Scanner fileScanner = new Scanner(new File(path + filename));
@@ -36,7 +39,7 @@ public class Main {
                 } catch (Exception e) {
                 }
             } while (!fileFound);
-            command.showData();
+            command.showTable();
 
             // Wait for user input
             while (!noFoodLeft) {
@@ -44,7 +47,6 @@ public class Main {
                 try {
                     input = receiveInput("Enter move (U = up, D = down, L = left, R = right, A = auto)");
                 } catch (Exception e) {
-                    System.out.println("Invalid input");
                 }
 
                 // direction: 0 = top, 1 = right, 2 = bottom, 3 = left
@@ -72,7 +74,7 @@ public class Main {
         //inputScanner.close();
     }
 
-    public static String receiveInput(String message) {
+    public static String receiveInput(String message)  {
         System.out.println(message);
         String input = "";
         try {
