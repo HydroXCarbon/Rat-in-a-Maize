@@ -16,54 +16,58 @@ public class Main {
 
     public static void main(String[] args) {
         String path = "src/main/java/Project1_135/maze/";
-        boolean fileFound = false;
+        while(true) {
+            boolean fileFound = false;
+            boolean noFoodLeft = false;
+            do {
+                try {
+                    // Receive file name from user
+                    String filename = receiveInput("New file name = ");
 
-        do {
-            try {
-                // Receive file name from user
-                String filename = receiveInput("New file name = ");
-                //String filename = "maize_1.txt";
-                // Read file and store data
-                Scanner fileScanner = new Scanner(new File(path + filename));
-                mazeSize = storeData(fileScanner, maze);
-                command.setSize(mazeSize);
+                    // Read file and store data
+                    Scanner fileScanner = new Scanner(new File(path + filename));
+                    mazeSize = storeData(fileScanner, maze);
+                    command.setSize(mazeSize);
 
-                // Close file and input scanner
-                fileFound = true;
-                fileScanner.close();
-                break;
-            } catch (Exception e) {
+                    // Close file and input scanner
+                    fileFound = true;
+                    fileScanner.close();
+                    break;
+                } catch (Exception e) {
+                }
+            } while (!fileFound);
+            command.showData();
+
+            // Wait for user input
+            while (!noFoodLeft) {
+                String input = "";
+                try {
+                    input = receiveInput("Enter move (U = up, D = down, L = left, R = right, A = auto)");
+                } catch (Exception e) {
+                    System.out.println("Invalid input");
+                }
+
+                // direction: 0 = top, 1 = right, 2 = bottom, 3 = left
+                switch (input) {
+                    case "u":
+                        noFoodLeft = Command.tryMove(0);
+                        break;
+                    case "d":
+                        noFoodLeft = Command.tryMove(2);
+                        break;
+                    case "l":
+                        noFoodLeft = Command.tryMove(3);
+                        break;
+                    case "r":
+                        noFoodLeft = Command.tryMove(1);
+                        break;
+                    case "a":
+                        noFoodLeft = Command.autoMode(1);
+                        break;
+                }
             }
-        } while (!fileFound);
-        command.showData();
-
-        // Wait for user input
-        while (true) {
-            String input = "";
-            try {
-                input = receiveInput("Enter move (U = up, D = down, L = left, R = right, A = auto)");
-            } catch (Exception e) {
-                System.out.println("Invalid input");
-            }
-
-            // direction: 0 = top, 1 = right, 2 = bottom, 3 = left
-            switch (input) {
-                case "u":
-                    Command.tryMove(0);
-                    break;
-                case "d":
-                    Command.tryMove(2);
-                    break;
-                case "l":
-                    Command.tryMove(3);
-                    break;
-                case "r":
-                    Command.tryMove(1);
-                    break;
-                case "a":
-                    Command.autoMode(1);
-                    break;
-            }
+            System.out.println("-------------------------------\n");
+            maze.clear();
         }
         //inputScanner.close();
     }

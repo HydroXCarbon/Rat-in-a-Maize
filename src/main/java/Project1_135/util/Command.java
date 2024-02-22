@@ -4,6 +4,7 @@ import Project1_135.model.Cell;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Random;
 
 import static java.lang.System.exit;
@@ -20,6 +21,8 @@ public class Command {
 
     private static int amountFood = 0;
 
+    private static int foodLeft = 0;
+
     // index 0 = row, index 1 = column
     private static int[] mazeSize = new int[2];
 
@@ -28,7 +31,7 @@ public class Command {
     }
 
     // direction: 0 = top, 1 = right, 2 = bottom, 3 = left
-    public static void tryMove(int direction) {
+    public static boolean tryMove(int direction) {
         int[] ratIndex = findRatIndex();
         int[] nextCellIndex = calculateNextCellIndex(ratIndex, direction);
         boolean movable = checkMovable(nextCellIndex);
@@ -36,14 +39,16 @@ public class Command {
             move(ratIndex, nextCellIndex);
             if(checkFood(nextCellIndex)) {
                 System.out.println("+++++ Found food +++++");
+                foodLeft--;
             };
         }else{
             System.out.println("Cannot Move");
         }
         showData();
+        return foodLeft == 0;
     }
 
-    public static void autoMode(int count) {
+    public static boolean autoMode(int count) {
         // Using DFS to find the route
         System.out.printf("\n===== Finding Food %d =====\n",count);
         int[] ratIndex = findRatIndex();
@@ -51,6 +56,7 @@ public class Command {
         DFS(ratIndex);
         if(foundFood){
             // Show path
+            foodLeft--;
             System.out.println("Rat path");
             for(int[] i : path){
                 int row = i[0];
@@ -96,14 +102,13 @@ public class Command {
             resetData();
             if(count < amountFood){
                 autoMode(count+1);
-            }else{
-                exit(0);
             }
         }else{
             System.out.println("No solution !!");
             resetData();
-            exit(0);
         }
+
+        return true;
     }
 
     private static void resetData(){
@@ -121,59 +126,99 @@ public class Command {
         path.clear();
     }
 
-    public static boolean DFS(int[] currentIndex){
+    public static boolean DFS(int[] currentIndex) {
         // If food has already been found, stop the recursion
         if (foundFood) {
             return true;
         }
 
-        path.add(currentIndex);
-        ArrayDeque<int[]> stack = new ArrayDeque<>();
-
-        // If rat found food return
-        if(checkFood(currentIndex)){
-            foundFood = true;
-            return true;
+        // Create a list to store directions
+        ArrayList<Integer> directions = new ArrayList<>();
+        for (int i = 0; i < 4; i++) {
+            directions.add(i);
         }
 
-        // direction: 0 = top, 1 = right, 2 = bottom, 3 = left
+        // Shuffle the directions for randomness
+        Collections.shuffle(directions);
+
         // Start searching each direction
-        ArrayList<int[]> tempStack = new ArrayList<>();
         maze.get(currentIndex[0]).get(currentIndex[1]).setVisited(true);
-        for (int i = 0; i < 4; i++) {
-            int[] nextCellIndex = calculateNextCellIndex(currentIndex, i);
+        for (int dir : directions) {
+            int[] nextCellIndex = calculateNextCellIndex(currentIndex, dir);
             boolean movable = checkMovable(nextCellIndex);
-            if (movable) {
-                if(!maze.get(nextCellIndex[0]).get(nextCellIndex[1]).getVisited()){
-                    nextCellIndex[2] = i;
-                    tempStack.add(nextCellIndex);
+            if (movable && !maze.get(nextCellIndex[0]).get(nextCellIndex[1]).getVisited()) {
+                path.addLast(currentIndex); // Add to path before moving
+                if (checkFood(nextCellIndex)) {
+                    path.addLast(nextCellIndex); // Add the food cell to path
+                    foundFood = true;
+                    return true;
+                }
+                if (DFS(nextCellIndex)) {
+                    return true;
                 }
             }
         }
 
         // If rat can't move return (backtracking)
-        if(tempStack.isEmpty()){
-            if (!path.isEmpty()) {
-                path.removeLast();
-            }
-            return false;
-        }
-
-        // Random add direction to stack
-        while(!tempStack.isEmpty()){
-            int randomIndex = rand.nextInt(tempStack.size());
-            int[] removedElement = tempStack.remove(randomIndex);
-            stack.add(removedElement);
-        }
-
-        // Move to next cell
-        while(!stack.isEmpty()){
-            if(DFS(stack.remove())){
-                return true;
-            }
+        if (!path.isEmpty()) {
+            path.removeLast();
         }
         return false;
     }
+
+//    public static boolean dfs(int[] currentIndex){
+//        // If food has already been found, stop the recursion
+//        if (foundFood) {
+//            return true;
+//        }
+//
+//        ArrayDeque<int[]> stack = new ArrayDeque<>();
+//        path.add(currentIndex);
+//
+//        // If rat found food return
+//        if(checkFood(currentIndex)){
+//            foundFood = true;
+//            return true;
+//        }
+//
+//        // direction: 0 = top, 1 = right, 2 = bottom, 3 = left
+//        // Start searching each direction
+//        ArrayList<int[]> tempStack = new ArrayList<>();
+//        maze.get(currentIndex[0]).get(currentIndex[1]).setVisited(true);
+//        for (int i = 0; i < 4; i++) {
+//            int[] nextCellIndex = calculateNextCellIndex(currentIndex, i);
+//            boolean movable = checkMovable(nextCellIndex);
+//            if (movable) {
+//                if(!maze.get(nextCellIndex[0]).get(nextCellIndex[1]).getVisited()){
+//                    nextCellIndex[2] = i;
+//                    tempStack.add(nextCellIndex);
+//                }
+//            }
+//        }
+//
+//        // If rat can't move return (backtracking)
+//        if(tempStack.isEmpty()){
+//            if (!path.isEmpty()) {
+//                path.removeLast();
+//            }
+//            return false;
+//        }
+//
+//        // Random add direction to stack
+//        while(!tempStack.isEmpty()){
+//            int randomIndex = rand.nextInt(tempStack.size());
+//            int[] removedElement = tempStack.remove(randomIndex);
+//            stack.add(removedElement);
+//        }
+//
+//        // Move to next cell
+//        while(!stack.isEmpty()){
+//            if(DFS(stack.remove())){
+//                return true;
+//            }
+//        }
+//        return false;
+//    }
 
     public static int[] calculateNextCellIndex(int[] currentIndex, int direction) {
         int[] nextCellIndex = currentIndex.clone();
@@ -191,6 +236,7 @@ public class Command {
                 nextCellIndex[1]--;
                 break;
         }
+        nextCellIndex[2] = direction;
         return nextCellIndex;
     }
 
@@ -239,6 +285,7 @@ public class Command {
 
     public void setsFood(int amount){
         amountFood = amount;
+        foodLeft = amount;
     }
 
     public static void showData() {
@@ -246,20 +293,20 @@ public class Command {
         int col = mazeSize[1];
 
         // Print column head
-//        System.out.printf("%12s", " ");
-//        for (int i = 0; i < col; i++) {
-//            String colHead = "col_" + (i);
-//            System.out.printf("%-12s", colHead);
-//        }
+        System.out.printf("%12s", " ");
+        for (int i = 0; i < col; i++) {
+            String colHead = "col_" + (i);
+            System.out.printf("%-12s", colHead);
+        }
         System.out.println();
 
         // Print row head and maze data
         for (int i = 0; i < row; i++) {
             for (int j = 0; j < col; j++) {
-//                if (j == 0) {
-//                    String rowHead = "row_" + (i);
-//                    System.out.printf("%-14s", rowHead);
-//                }
+                if (j == 0) {
+                    String rowHead = "row_" + (i);
+                    System.out.printf("%-14s", rowHead);
+                }
                 String status;
                 if (maze.get(i).get(j).getStatus() == 2) {
                     status = "\033[0;31m" + "R" + "\033[0m";
