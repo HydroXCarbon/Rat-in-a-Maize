@@ -242,7 +242,7 @@ public class Command {
         System.out.printf("%12s", " ");
         for (int i = 0; i < col; i++) {
             String colHead = "col_" + (i);
-            System.out.printf("%-12s", colHead);
+            System.out.printf("%-13s", colHead);
         }
         System.out.println();
 
