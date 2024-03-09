@@ -1,12 +1,15 @@
 package Project1_135.util;
 
+//นายธนกฤต     ชุติวงศ์ธนะพัฒน์       6513112
+//นายภูรินท์	   พงษ์พานิช 	        6513135
+//นายจารุภัทร	   โชติสิตานันท์	    6513161
+//นางสาวชลิษา	   บัวทอง		    6513163
+
 import Project1_135.model.Cell;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collections;
-
-import static java.lang.System.exit;
 
 public class Command {
 
@@ -19,6 +22,8 @@ public class Command {
     private static int amountFood = 0;
 
     private static int foodLeft = 0;
+
+    private static int[] firstIndex = new int[3];
 
     // index 0 = row, index 1 = column
     private static int[] mazeSize = new int[2];
@@ -48,9 +53,9 @@ public class Command {
     public static boolean autoMode(int count) {
         // Using DFS to find the route
         System.out.printf("\n===== Finding Food %d =====\n",count);
-        int[] ratIndex = findRatIndex();
+        firstIndex = findRatIndex();
         showTable();
-        DFS(ratIndex);
+        DFS(firstIndex);
         if(foundFood){
             // Show path
             foodLeft--;
@@ -97,7 +102,6 @@ public class Command {
                     strStatus = "F";
                 }
                 System.out.printf("%-7s : -> (row %d, col %d, %s)\n",strDirection,row ,col ,strStatus);
-                move(ratIndex, path.getLast());
             }
             resetData();
             if(count < amountFood){
@@ -121,6 +125,9 @@ public class Command {
 
         // Clear foundFood
         foundFood = false;
+
+        // Clear firstIndex
+        firstIndex = new int[3];
 
         // Clear path
         path.clear();
@@ -148,11 +155,16 @@ public class Command {
             boolean movable = checkMovable(nextCellIndex);
             if (movable && !maze.get(nextCellIndex[0]).get(nextCellIndex[1]).getVisited()) {
                 path.addLast(currentIndex); // Add to path before moving
-                if (checkFood(nextCellIndex)) {
+                boolean temp = checkFood(nextCellIndex);
+                move(currentIndex, nextCellIndex);
+                showTable();
+
+                if (temp) {
                     path.addLast(nextCellIndex); // Add the food cell to path
                     foundFood = true;
                     return true;
                 }
+
                 if (DFS(nextCellIndex)) {
                     return true;
                 }
@@ -161,7 +173,12 @@ public class Command {
 
         // If rat can't move return (backtracking)
         if (!path.isEmpty()) {
-            path.removeLast();
+            if (!path.isEmpty()) {
+                move(currentIndex, path.removeLast());
+            }else{
+                move(currentIndex, firstIndex);
+            }
+            showTable();
         }
         return false;
     }
@@ -196,8 +213,19 @@ public class Command {
     private static void move(int[] ratIndex, int[] nextCellIndex) {
         // status: 0 = wall, 1 = ground,  2 = ground with rat, 3 = ground with Food
         // Move
-        maze.get(ratIndex[0]).get(ratIndex[1]).setStatus(1);
-        maze.get(nextCellIndex[0]).get(nextCellIndex[1]).setStatus(2);
+        int ratStatus = maze.get(ratIndex[0]).get(ratIndex[1]).getStatus();
+        int nextCellStatus = maze.get(nextCellIndex[0]).get(nextCellIndex[1]).getStatus();
+
+        // If the next cell is food, set its status to 2 (ground with rat)
+        if (nextCellStatus == 3) {
+            maze.get(nextCellIndex[0]).get(nextCellIndex[1]).setStatus(2);
+            maze.get(ratIndex[0]).get(ratIndex[1]).setStatus(1);
+        } else {
+            // Otherwise, switch the status of the rat and the next cell
+            maze.get(ratIndex[0]).get(ratIndex[1]).setStatus(nextCellStatus);
+            maze.get(nextCellIndex[0]).get(nextCellIndex[1]).setStatus(ratStatus);
+        }
+
     }
 
     // direction: 0 = top, 1 = right, 2 = bottom, 3 = left

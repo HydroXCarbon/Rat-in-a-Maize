@@ -1,5 +1,10 @@
 package Project1_135.model;
 
+//นายธนกฤต     ชุติวงศ์ธนะพัฒน์       6513112
+//นายภูรินท์	   พงษ์พานิช 	        6513135
+//นายจารุภัทร	   โชติสิตานันท์	    6513161
+//นางสาวชลิษา	   บัวทอง		    6513163
+
 public class Cell {
 
     // status: 0 = wall, 1 = ground,  2 = ground with rat, 3 = ground with Food

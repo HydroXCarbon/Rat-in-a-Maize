@@ -1,11 +1,16 @@
 package Project1_135;
 
+//นายธนกฤต     ชุติวงศ์ธนะพัฒน์       6513112
+//นายภูรินท์	   พงษ์พานิช 	        6513135
+//นายจารุภัทร	   โชติสิตานันท์	    6513161
+//นางสาวชลิษา	   บัวทอง		    6513163
+
 import Project1_135.model.Cell;
 import Project1_135.util.Command;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Scanner;
+import java.util.ArrayList;
 
 public class Main {
 
